@@ -23,7 +23,19 @@ def positional_encoding(position, d_model):
   return tf.cast(pos_encoding, dtype=tf.float32)
 
 class TransformerEncoder(layers.Layer):
+  """transformerのEncoderのMulti Head Atttentionやその周辺の繰り返されるlayerをまとめて実装する。
+
+  Args:
+      layers (_type_): _description_
+  """
   def __init__(self, embed_dim, dense_dim, num_heads, rate, **kwargs):
+    """
+    Args:
+        embed_dim (_type_): _description_
+        dense_dim (_type_): _description_
+        num_heads (_type_): _description_
+        rate (_type_): _description_
+    """
     super().__init__(**kwargs)
     self.embed_dim = embed_dim    #入力トークンベクトルのサイズ
     self.dense_dim = dense_dim     #内側のDense層の次元
@@ -74,7 +86,7 @@ class TransformerEncoder(layers.Layer):
 
 
 class Encoder(tf.keras.layers.Layer):
-  def __init__(self, num_layers, d_model, num_heads, dff, input_vocab_size,
+  def __init__(self, num_layers, d_model, num_heads, dff,
                maximum_position_encoding, rate=0.1):
     super().__init__()
 

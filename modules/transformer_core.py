@@ -37,12 +37,23 @@ class TransformerBaseTimeSeriesForecastModel(tf.keras.Model):
 
 
 class EncoderWithMultiHeadAttentionBaseTimeSeriesForecastModel(tf.keras.layers.Layer):
-  def __init__(self, num_layers, d_model, num_heads, dff, input_vocab_size, 
-              pe_input, window_width, rate=0.1):
+  """transformerのEncoderによる時系列予測モデル用のLayerクラス
+  """
+  def __init__(self, num_layers : int, d_model : int, num_heads : int, dff : int,  
+              pe_input : int, window_width : int, rate=0.1):
+    """
+    Args:
+        num_layers (int): TransformerEncoder（MuliHeadAtteintionLayerとその周辺部）を繰り返す回数
+        d_model (int): モデル内での特徴量の次元。多変量時系列データ(time✖️d_origin)の場合、(time✖️d_model)に変換することになる。
+        num_heads (int): MuliHeadAtteintionでのheadの個数
+        dff (int): TransformerEncoderで実装される全結合層のユニット数。
+        pe_input (int): 位置エンコーディングで用いる値。transformer_layers.positional_encodingの説明参照。
+        window_width (int): 時系列の窓幅。
+        rate (float, optional): dropoutのパラメータ. Defaults to 0.1.
+    """
     super().__init__()
 
-    self.encoder = Encoder(num_layers, d_model, num_heads, dff, 
-                           input_vocab_size, pe_input, rate)
+    self.encoder = Encoder(num_layers, d_model, num_heads, dff, pe_input, rate)
 
     self.final_layer = tf.keras.layers.Dense(1)
 
