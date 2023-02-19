@@ -4,6 +4,16 @@ from tensorflow import keras
 from tensorflow.keras import layers
 
 def get_angles(pos, i, d_model):
+  """_summary_
+
+  Args:
+      pos (ndarray): 0, 1,..., 定数　を順に値にもつ縦ベクトル。最大値の定数はtransformerクラスのインスタンス時に定義される。
+      i (ndarray): 0, 1, ..., d_modelを順に値にもつ横ベクトル。
+      d_model (int): モデル内での特徴量の次元。多変量時系列データ(time✖️d_origin)の場合、(time✖️d_model)に変換することになる。
+
+  Returns:
+      _type_: _description_
+  """
   angle_rates = 1 / np.power(10000, (2 * (i//2)) / np.float32(d_model))
   return pos * angle_rates
 
@@ -24,17 +34,15 @@ def positional_encoding(position, d_model):
 
 class TransformerEncoder(layers.Layer):
   """transformerのEncoderのMulti Head Atttentionやその周辺の繰り返されるlayerをまとめて実装する。
-
-  Args:
-      layers (_type_): _description_
   """
-  def __init__(self, embed_dim, dense_dim, num_heads, rate, **kwargs):
-    """
+  def __init__(self, embed_dim : int, dense_dim : int, num_heads : int, rate : float, **kwargs):
+    """_summary_
+
     Args:
-        embed_dim (_type_): _description_
-        dense_dim (_type_): _description_
-        num_heads (_type_): _description_
-        rate (_type_): _description_
+        embed_dim (int): モデル内での特徴量の次元。多変量時系列データ(time✖️d_origin)の場合、(time✖️d_model)に変換することになる。
+        dense_dim (int): 全結合層のユニット数。
+        num_heads (int): MuliHeadAtteintionでのheadの個数
+        rate (float): dropoutのパラメータ
     """
     super().__init__(**kwargs)
     self.embed_dim = embed_dim    #入力トークンベクトルのサイズ
@@ -86,8 +94,19 @@ class TransformerEncoder(layers.Layer):
 
 
 class Encoder(tf.keras.layers.Layer):
-  def __init__(self, num_layers, d_model, num_heads, dff,
-               maximum_position_encoding, rate=0.1):
+  """transformerのEncoderを実装するLayerクラス
+  """
+  def __init__(self, num_layers : int, d_model : int, num_heads : int, dff : int,
+               maximum_position_encoding : int, rate=0.1):
+    """
+    Args:
+        num_layers (int): TransformerEncoder（MuliHeadAtteintionLayerとその周辺部）を繰り返す回数
+        d_model (int): モデル内での特徴量の次元。多変量時系列データ(time✖️d_origin)の場合、(time✖️d_model)に変換することになる。
+        num_heads (int): MuliHeadAtteintionでのheadの個数
+        dff (int): TransformerEncoderで実装される全結合層のユニット数。
+        maximum_position_encoding (int): 入力系列の位置エンコーディングで用いる値。transformer_layers.positional_encodingの説明参照。
+        rate (float, optional): dropoutのパラメータ. Defaults to 0.1.
+    """
     super().__init__()
 
     self.d_model = d_model
@@ -125,7 +144,17 @@ class Encoder(tf.keras.layers.Layer):
 
 
 class TransformerDecoder(tf.keras.layers.Layer):
-  def __init__(self, embed_dim, dense_dim, num_heads, rate, **kwargs):
+  """transformerのDecoderのMulti Head Atttentionやその周辺の繰り返されるlayerをまとめて実装する。
+  """
+  def __init__(self, embed_dim : int, dense_dim : int, num_heads : int, rate : float, **kwargs):
+    """_summary_
+
+    Args:
+        embed_dim (int): モデル内での特徴量の次元。多変量時系列データ(time✖️d_origin)の場合、(time✖️d_model)に変換することになる。
+        dense_dim (int): 全結合層のユニット数。
+        num_heads (int): MuliHeadAtteintionでのheadの個数
+        rate (float): dropoutのパラメータ
+    """
     super().__init__(**kwargs)
     self.embed_dim = embed_dim
     self.dense_dim = dense_dim
@@ -197,8 +226,19 @@ class TransformerDecoder(tf.keras.layers.Layer):
 
 
 class Decoder(tf.keras.layers.Layer):
-  def __init__(self, num_layers, d_model, num_heads, dff, target_vocab_size,
-               maximum_position_encoding, rate=0.1):
+  """transformerのDecoderを実装するLayerクラス
+  """
+  def __init__(self, num_layers : int, d_model : int, num_heads : int, dff : int,
+               maximum_position_encoding : int, rate=0.1):
+    """
+    Args:
+        num_layers (int): TransformerEncoder（MuliHeadAtteintionLayerとその周辺部）を繰り返す回数
+        d_model (int): モデル内での特徴量の次元。多変量時系列データ(time✖️d_origin)の場合、(time✖️d_model)に変換することになる。
+        num_heads (int): MuliHeadAtteintionでのheadの個数
+        dff (int): TransformerEncoderで実装される全結合層のユニット数。
+        maximum_position_encoding (int): 入力系列の位置エンコーディングで用いる値。transformer_layers.positional_encodingの説明参照。
+        rate (float, optional): dropoutのパラメータ. Defaults to 0.1.
+    """
     super().__init__()
 
     self.d_model = d_model
