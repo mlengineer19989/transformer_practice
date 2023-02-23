@@ -163,12 +163,22 @@ def textbook_method_multistep(raw_data, temperature, sampling_rate, sequence_len
   print("num_val_samples:", num_val_samples)
   print("num_test_samples:", num_test_samples)
 
+  sequence_length *= sampling_rate
+
   mean = raw_data[:num_train_samples].mean(axis=0)
   raw_data -= mean
   std = raw_data[:num_train_samples].std(axis=0)
   raw_data /= std
 
-  tar_temp = np.array([temperature[i+delay : i+delay+pred_points] for i in range(len(temperature[delay:-pred_points]))])
+  #tar_temp = np.array([temperature[i+delay : i+delay+pred_points] for i in range(len(temperature[delay:-pred_points]))])
+  tar_temp = []
+  for i in range(len(temperature[:-pred_points])):
+    if i < pred_points:
+      tar_temp.append(None)
+    else:
+      tar_temp.append(temperature[i+1-pred_points : i+1])
+  tar_temp = np.array(tar_temp)
+
   train_dataset = TimeseriesGenerator(raw_data[:-delay-pred_points], 
                                       tar_temp, 
                                       length=sequence_length, 
@@ -193,7 +203,7 @@ def textbook_method_multistep(raw_data, temperature, sampling_rate, sequence_len
                                       tar_temp, 
                                       length=sequence_length, 
                                       sampling_rate=sampling_rate, 
-                                      shuffle=True,
+                                      shuffle=False,
                                       batch_size=batch_size,
                                       start_index=num_train_samples + num_val_samples)
   
