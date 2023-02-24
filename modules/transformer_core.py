@@ -33,7 +33,7 @@ class TransformerBaseTimeSeriesForecastModel(tf.keras.Model):
   def call(self, inp, training, enc_padding_mask=None, dec_padding_mask=None):
     
     enc_input = inp[:,:self.window_width]
-    dec_input = inp[:,self.window_width:]
+    dec_input = inp[:,self.window_width-1:]
 
     enc_output = self.encoder(enc_input, training, enc_padding_mask)  # (batch_size, inp_seq_len, d_model)
     
