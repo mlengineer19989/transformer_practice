@@ -156,6 +156,8 @@ def textbook_method(raw_data, temperature, sampling_rate, sequence_length, delay
 
 
 def textbook_method_multistep(raw_data, temperature, sampling_rate, sequence_length, delay, pred_points, batch_size):
+  input_length = sequence_length + pred_points -1
+  
   num_train_samples = int(0.5 * len(raw_data))
   num_val_samples = int(0.25 * len(raw_data))
   num_test_samples = len(raw_data) - num_train_samples - num_val_samples
@@ -172,7 +174,7 @@ def textbook_method_multistep(raw_data, temperature, sampling_rate, sequence_len
 
   #tar_temp = np.array([temperature[i+delay : i+delay+pred_points] for i in range(len(temperature[delay:-pred_points]))])
   tar_temp = []
-  for i in range(len(temperature[:-pred_points])):
+  for i in range(len(temperature[:-delay-pred_points])):
     if i < pred_points:
       tar_temp.append(None)
     else:
@@ -181,7 +183,7 @@ def textbook_method_multistep(raw_data, temperature, sampling_rate, sequence_len
 
   train_dataset = TimeseriesGenerator(raw_data[:-delay-pred_points], 
                                       tar_temp, 
-                                      length=sequence_length, 
+                                      length=input_length, 
                                       sampling_rate=sampling_rate, 
                                       shuffle=True,
                                       batch_size=batch_size,
@@ -191,7 +193,7 @@ def textbook_method_multistep(raw_data, temperature, sampling_rate, sequence_len
   
   val_dataset = TimeseriesGenerator(raw_data[:-delay-pred_points], 
                                       tar_temp, 
-                                      length=sequence_length, 
+                                      length=input_length, 
                                       sampling_rate=sampling_rate, 
                                       shuffle=True,
                                       batch_size=batch_size,
@@ -201,7 +203,7 @@ def textbook_method_multistep(raw_data, temperature, sampling_rate, sequence_len
   
   test_dataset = TimeseriesGenerator(raw_data[:-delay-pred_points], 
                                       tar_temp, 
-                                      length=sequence_length, 
+                                      length=input_length, 
                                       sampling_rate=sampling_rate, 
                                       shuffle=False,
                                       batch_size=batch_size,
