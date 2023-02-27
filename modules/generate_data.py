@@ -114,16 +114,21 @@ class PreprocessData():
     Returns:
         _type_: _description_
     """
-    input_length = self.sequence_length + pred_points -1
+    input_length = self.sequence_length + pred_points - self.sampling_rate
     sequence_length = self.sampling_rate * self.sequence_length
 
     #tar_temp生成
+    resampled_targets = []
+    for i in range(0, len(self.targets), self.sampling_rate):
+      resampled_targets.append(self.targets[i])
+    resampled_targets = np.array(resampled_targets)
+
     tar_temp = []
-    for i in range(len(self.targets[:-self.delay-pred_points])):
-      if i < pred_points:
+    for i in range(len(resampled_targets[:-self.delay//self.sampling_rate-pred_points//self.sampling_rate])):
+      if i < pred_points//self.sampling_rate:
         tar_temp.append(None)
       else:
-        tar_temp.append(self.targets[i+1-pred_points : i+1])
+        tar_temp.append(resampled_targets[i+1-pred_points//self.sampling_rate : i+1])
     tar_temp = np.array(tar_temp)
 
     train_dataset = TimeseriesGenerator(self.raw_data[:-self.delay-pred_points], 
