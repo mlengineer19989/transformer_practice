@@ -37,8 +37,6 @@ class TransformerBaseTimeSeriesForecastModel(tf.keras.Model):
 
     enc_output = self.encoder(enc_input, training, enc_padding_mask)  # (batch_size, inp_seq_len, d_model)
     
-    
-    # dec_output.shape == (batch_size, tar_seq_len, d_model)
     dec_output = self.decoder(dec_input, enc_output, training, dec_padding_mask)
 
     final_output = self.final_layer(dec_output)  # (batch_size, tar_seq_len, target_vocab_size)

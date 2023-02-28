@@ -18,7 +18,8 @@ class PreprocessData():
               sequence_length : int, 
               delay : int, 
               batch_size: int, 
-              sampling_rate : int=None):
+              sampling_rate : int=None, 
+              normalize : bool = True):
     """
     Args:
         raw_data (_type_): 説明変数の配列
@@ -42,7 +43,8 @@ class PreprocessData():
     print("num_val_samples:", self.num_val_samples)
     print("num_test_samples:", self.num_test_samples)
     
-    self.mean, self.std = self.normalization()
+    if normalize:
+      self.mean, self.std = self.normalization()
 
   def normalization(self):
     #正規化
@@ -116,7 +118,7 @@ class PreprocessData():
     """
     sequence_length = self.sequence_length * self.sampling_rate
     pred_points = pred_points * self.sampling_rate
-    delay = self.sampling_rate * self.delay
+    delay = self.delay
     input_length = sequence_length + pred_points - self.sampling_rate
 
     #tar_temp生成
@@ -127,7 +129,7 @@ class PreprocessData():
       else:
         resampled_targets = []
         for step in range(0, pred_points, self.sampling_rate):
-          resampled_targets.append(self.targets[i+step])
+          resampled_targets.append(self.targets[i+self.sampling_rate-pred_points+step])
         tar_temp.append(resampled_targets)
     tar_temp = np.array(tar_temp)
 
