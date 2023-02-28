@@ -114,12 +114,14 @@ class PreprocessData():
     Returns:
         _type_: _description_
     """
-    input_length = self.sequence_length + pred_points - self.sampling_rate
-    sequence_length = self.sampling_rate * self.sequence_length
+    sequence_length = self.sequence_length * self.sampling_rate
+    pred_points = pred_points * self.sampling_rate
+    delay = self.sampling_rate * self.delay
+    input_length = sequence_length + pred_points - self.sampling_rate
 
     #tar_temp生成
     tar_temp = []
-    for i in range(len(self.targets[:-self.delay-pred_points])):
+    for i in range(len(self.targets[:-delay-pred_points])):
       if i < pred_points:
         tar_temp.append(None)
       else:
@@ -129,7 +131,7 @@ class PreprocessData():
         tar_temp.append(resampled_targets)
     tar_temp = np.array(tar_temp)
 
-    train_dataset = TimeseriesGenerator(self.raw_data[:-self.delay-pred_points], 
+    train_dataset = TimeseriesGenerator(self.raw_data[:-delay-pred_points], 
                                         tar_temp, 
                                         length=input_length, 
                                         sampling_rate=self.sampling_rate, 
@@ -139,7 +141,7 @@ class PreprocessData():
                                         end_index=self.num_train_samples)
 
     
-    val_dataset = TimeseriesGenerator(self.raw_data[:-self.delay-pred_points], 
+    val_dataset = TimeseriesGenerator(self.raw_data[:-delay-pred_points], 
                                         tar_temp, 
                                         length=input_length, 
                                         sampling_rate=self.sampling_rate, 
@@ -149,7 +151,7 @@ class PreprocessData():
                                         end_index=self.num_train_samples + self.num_val_samples)
 
     
-    test_dataset = TimeseriesGenerator(self.raw_data[:-self.delay-pred_points], 
+    test_dataset = TimeseriesGenerator(self.raw_data[:-delay-pred_points], 
                                         tar_temp, 
                                         length=input_length, 
                                         sampling_rate=self.sampling_rate, 
