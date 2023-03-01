@@ -129,7 +129,7 @@ class PreprocessData():
       else:
         resampled_targets = []
         for step in range(0, pred_points, self.sampling_rate):
-          resampled_targets.append(self.targets[i+self.sampling_rate-pred_points+step])
+          resampled_targets.append(self.targets[i + self.sampling_rate - pred_points + step])
         tar_temp.append(resampled_targets)
     tar_temp = np.array(tar_temp)
 
@@ -137,6 +137,7 @@ class PreprocessData():
                                         tar_temp, 
                                         length=input_length, 
                                         sampling_rate=self.sampling_rate, 
+                                        stride = self.sampling_rate,
                                         shuffle=True,
                                         batch_size=self.batch_size,
                                         start_index=0,
@@ -147,6 +148,7 @@ class PreprocessData():
                                         tar_temp, 
                                         length=input_length, 
                                         sampling_rate=self.sampling_rate, 
+                                        stride = self.sampling_rate,
                                         shuffle=True,
                                         batch_size=self.batch_size,
                                         start_index=self.num_train_samples,
@@ -157,6 +159,7 @@ class PreprocessData():
                                         tar_temp, 
                                         length=input_length, 
                                         sampling_rate=self.sampling_rate, 
+                                        stride = self.sampling_rate,
                                         shuffle=False,
                                         batch_size=self.batch_size,
                                         start_index=self.num_train_samples + self.num_val_samples)
